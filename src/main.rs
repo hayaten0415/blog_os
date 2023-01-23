@@ -1,17 +1,26 @@
-#![no_std] // Rust の標準ライブラリにリンクしない
-#![no_main] // 全ての Rust レベルのエントリポイントを無効にする
+#![no_std] // don't link the Rust standard library
+#![no_main] // disable all Rust-level entry points
 
 use core::panic::PanicInfo;
 
-#[no_mangle] // この関数の名前修飾をしない
-pub extern "C" fn _start() -> ! {
-    // リンカはデフォルトで `_start` という名前の関数を探すので、
-    // この関数がエントリポイントとなる
+/// This function is called on panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-/// この関数はパニック時に呼ばれる
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+static HELLO: &[u8] = b"Hello World!";
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    let vga_buffer = 0xb8000 as *mut u8;
+
+    for (i, &byte) in HELLO.iter().enumerate() {
+        unsafe {
+            *vga_buffer.offset(i as isize * 2) = byte;
+            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
+        }
+    }
+
     loop {}
 }
