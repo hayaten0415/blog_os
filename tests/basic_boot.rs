@@ -7,26 +7,20 @@
 use core::panic::PanicInfo;
 use blog_os::println;
 
+
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
-
-    #[cfg(test)]
     test_main();
 
     loop {}
 }
 
-/// この関数はパニック時に呼ばれる。
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
-    loop {}
-}
-
-#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     blog_os::test_panic_handler(info)
+}
+
+#[test_case]
+fn test_println() {
+    println!("test_println output");
 }
