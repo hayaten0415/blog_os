@@ -13,8 +13,12 @@ pub extern "C" fn _start() -> ! {
 
     blog_os::init();
 
-    // invoke a breakpoint exception
-    x86_64::instructions::interrupts::int3();
+    fn stack_overflow() {
+        stack_overflow(); // 再帰呼び出しのために、リターンアドレスがプッシュされる
+    }
+
+    // スタックオーバーフローを起こす
+    stack_overflow();
 
     #[cfg(test)]
     test_main();
