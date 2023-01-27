@@ -18,12 +18,13 @@ pub extern "C" fn _start() -> ! {
     }
 
     // スタックオーバーフローを起こす
-    stack_overflow();
+    //stack_overflow();
 
     #[cfg(test)]
     test_main();
 
-    loop {}
+    println!("It did not crash!");
+    blog_os::hlt_loop();
 }
 
 /// この関数はパニック時に呼ばれる。
@@ -31,7 +32,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    blog_os::hlt_loop();
 }
 
 #[cfg(test)]
