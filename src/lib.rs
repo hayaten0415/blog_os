@@ -1,14 +1,18 @@
+#![feature(alloc_error_handler)] 
 #![feature(abi_x86_interrupt)]
 #![no_std]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+
+extern crate alloc;
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
 pub mod memory;
+pub mod allocator;
 use core::panic::PanicInfo;
 
 pub trait Testable {
@@ -83,6 +87,11 @@ pub fn hlt_loop() -> ! {
     loop {
         x86_64::instructions::hlt();
     }
+}
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
 }
 
 pub fn init() {
